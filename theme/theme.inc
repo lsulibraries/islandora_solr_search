@@ -62,7 +62,18 @@ function template_preprocess_islandora_solr_wrapper(&$variables) {
  * Default template: theme/islandora-solr.tpl.php.
  */
 function template_preprocess_islandora_solr(&$variables) {
-
+  $publish =[];
+  $results = $variables['results'];
+  $query = db_query('select *  FROM islandora_collection_toggle_publish_collections');
+  foreach ($results as $key => $value) {
+      foreach($query->fetchAll() as $item){
+        if ($value['PID'] != $item->pid){
+          $publish[$key] = $value;
+        }
+      }
+    }
+  $results = $publish;
+  $variables['results'] = $results;
   $results = $variables['results'];
   foreach ($results as $key => $result) {
     // Thumbnail.
