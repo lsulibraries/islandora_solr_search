@@ -84,10 +84,35 @@ function template_preprocess_islandora_solr(&$variables) {
     if (isset($result['object_url_fragment'])) {
       $options['fragment'] = $result['object_url_fragment'];
     }
+    $replaced = replace_label_for_pages($result);
+    $variables['results'][$key]['solr_doc']['dc.title']['value'] = $replaced;
     // Thumbnail link.
     $variables['results'][$key]['thumbnail'] = l($image, $result['object_url'], $options);
   }
 }
+
+function replace_label_for_pages($result) {
+  foreach ($result['content_models'] as $model) {
+    $bookpage = $model == 'info:fedora/islandora:pageCModel';
+    $newspage = $model == 'info:fedora/islandora:newspaperPageCModel';
+    if ($newspage || $bookpage) {
+      $object = islandora_object_load($result['PID']);
+      $label = $object->label;
+      $parent = $object->getParents();
+      unset($object);
+      foreach($parent as $key => $pid){
+        $parent = islandora_object_load($pid);
+        $orig = explode(':', $label);
+        $orig = explode('-', $orig[1]);
+        $page =  ': Page ' . $orig[1];
+        $text  = $parent->label;
+        $replaced = preg_replace('#(<a.*?>).*?(</a>)#', "$1$text $page$2", $result['solr_doc']['dc.title']['value']);
+        return $replaced;
+      }
+    }
+  }
+}
+
 
 /**
  * Prepares variables for islandora_solr_facet templates.
