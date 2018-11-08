@@ -438,7 +438,12 @@ function islandora_solr_prepare_solr_results($solr_results) {
           $value = array_map($map_to_link, (array) $original_value, (array) $value);
         }
         elseif (in_array($field, $link_to_object)) {
-          $value = l(implode($separator, $value), $object_result['object_url'], $options);
+          if(isset($object_result['object_url'])) {
+            $value = l(implode($separator, $value), $object_result['object_url'], $options);
+          }
+          else {
+            $value = implode($separator, $value);
+          }
         }
       }
       // Implode.

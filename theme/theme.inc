@@ -96,9 +96,16 @@ function template_preprocess_islandora_solr(&$variables) {
       $options['fragment'] = $result['object_url_fragment'];
     }
     // Thumbnail link.
-    $variables['results'][$key]['thumbnail'] = l($image, $result['object_url'], $options);
+    if (isset($result['object_url'])){
+      $variables['results'][$key]['thumbnail'] = l($image, $result['object_url'], $options);
+    }
+    else{
+      $variables['results'][$key]['thumbnail'] = $image;
+    }
   }
 }
+
+
 
 /**
  * Prepares variables for islandora_solr_facet templates.
